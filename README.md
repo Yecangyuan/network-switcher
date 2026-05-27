@@ -1,10 +1,12 @@
 # Network Switcher
 
-A lightweight, cross-platform CLI tool for switching ethernet subnet masks and IP configurations. Primarily optimized for **Windows 10**, with full support for **macOS** and **Linux**.
+A lightweight, cross-platform GUI/CLI tool for switching ethernet subnet masks and IP configurations. Primarily optimized for **Windows 10**, with full support for **macOS** and **Linux**.
 
 ## Features
 
 - **Cross-platform**: Windows 10, macOS, Linux
+- **GUI mode**: Easy-to-use Tkinter interface (no extra dependencies)
+- **CLI mode**: Full command-line support for scripting
 - **List interfaces**: Display all network interfaces with IP, MAC, mask, and status
 - **Set static IP**: Configure static IP and subnet mask
 - **DHCP mode**: Switch back to DHCP easily
@@ -23,6 +25,25 @@ python -m network_switcher list
 ```
 
 ## Usage
+
+### GUI Mode
+
+Launch the graphical interface (requires a display):
+
+```bash
+network-switcher-gui
+```
+
+GUI features:
+- **Interface list**: Browse all network adapters in a sortable table
+- **One-click select**: Click any row to auto-fill the interface name
+- **Set Static IP**: Enter IP, mask, and optional gateway, then click "Set Static IP"
+- **Enable DHCP**: Click "Enable DHCP" to switch the selected interface to DHCP
+- **Refresh**: Reload the interface list after making changes
+
+> **Note**: On Windows, right-click and "Run as administrator". On macOS/Linux, prefix with `sudo`.
+
+### CLI Mode
 
 ### List network interfaces
 
@@ -73,7 +94,8 @@ sudo network-switcher dhcp en0
 src/network_switcher/
 ├── __init__.py
 ├── __main__.py       # python -m entry point
-├── cli.py            # Argument parsing and user interface
+├── cli.py            # Command-line interface
+├── gui.py            # Tkinter graphical interface
 ├── core.py           # Platform detection and routing
 └── platforms/
     ├── base.py       # Abstract base adapter
