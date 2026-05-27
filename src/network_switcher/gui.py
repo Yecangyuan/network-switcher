@@ -90,6 +90,11 @@ class NetworkSwitcherGUI:
         ttk.Button(btn_frame, text="Set Static IP", command=self._set_static).pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_frame, text="Enable DHCP", command=self._enable_dhcp).pack(side=tk.LEFT, padx=5)
 
+        ttk.Separator(btn_frame, orient=tk.VERTICAL).pack(side=tk.LEFT, fill=tk.Y, padx=10)
+
+        ttk.Button(btn_frame, text="Switch to /16 (255.255.0.0)", command=lambda: self._apply_mask("255.255.0.0")).pack(side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="Switch to /24 (255.255.255.0)", command=lambda: self._apply_mask("255.255.255.0")).pack(side=tk.LEFT, padx=5)
+
         # Status bar
         self.status_var = tk.StringVar(value="Ready")
         status_bar = ttk.Label(self.root, textvariable=self.status_var, relief=tk.SUNKEN, anchor=tk.W)
@@ -160,6 +165,42 @@ class NetworkSwitcherGUI:
             self.status_var.set("Permission denied")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to set static IP:\n{e}")
+            self.status_var.set("Error")
+
+    def _apply_mask(self, mask: str) -> None:
+        try:
+            name = self._get_selected_name()
+        except ValueError as e:
+            messagebox.showwarning("Warning", str(e))
+            return
+
+        ip = self.entry_ip.get().strip()
+        if not ip:
+            # Fallback to current interface IP
+            selection = self.tree.selection()
+            if selection:
+                current_ip = self.tree.item(selection[0])["values"][2]
+                if current_ip and current_ip != "-":
+                    ip = current_ip
+
+        if not ip:
+            messagebox.showwarning("Warning", "IP Address is required. Enter an IP or select an interface that already has one.")
+            return
+
+        gateway = self.entry_gateway.get().strip() or None
+
+        self.status_var.set(f"Switching {name} to {mask}...")
+        self.root.update_idletasks()
+
+        try:
+            set_static(name, ip, mask, gateway)
+            messagebox.showinfo("Success", f"Subnet mask changed for {name}:\n{ip} / {mask}")
+            self.refresh_interfaces()
+        except PermissionError:
+            messagebox.showerror("Permission Denied", "Administrator/root privileges are required to modify network settings.")
+            self.status_var.set("Permission denied")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to change subnet mask:\n{e}")
             self.status_var.set("Error")
 
     def _enable_dhcp(self) -> None:
