@@ -1,6 +1,5 @@
 """Windows platform adapter using netsh and PowerShell."""
 
-import re
 import subprocess
 from typing import List, Optional
 
@@ -20,12 +19,12 @@ class WindowsAdapter(PlatformAdapter):
         interfaces = []
 
         # Skip header lines (first 2 or 3 lines)
-        data_lines = [l for l in lines if l.strip() and not l.strip().startswith("-") and "Admin State" not in l]
+        data_lines = [line for line in lines if line.strip() and not line.strip().startswith("-") and "Admin State" not in line]
 
         for line in data_lines:
             parts = line.strip().split(None, 3)
             if len(parts) >= 4:
-                status, iface_type, conn_state, name = parts[0], parts[1], parts[2], parts[3]
+                _status, _iface_type, conn_state, name = parts[0], parts[1], parts[2], parts[3]
                 iface = NetworkInterface(name=name, alias=name, status=conn_state)
                 interfaces.append(iface)
 

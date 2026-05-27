@@ -5,7 +5,6 @@ from tkinter import ttk, messagebox
 from typing import Optional
 
 from .core import list_interfaces, set_static, set_dhcp
-from .platforms.base import NetworkInterface
 
 
 class NetworkSwitcherGUI:
@@ -227,6 +226,6 @@ class NetworkSwitcherGUI:
 
 def main() -> int:
     root = tk.Tk()
-    app = NetworkSwitcherGUI(root)
+    NetworkSwitcherGUI(root)
     root.mainloop()
     return 0

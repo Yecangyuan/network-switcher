@@ -45,7 +45,6 @@ class MacOSAdapter(PlatformAdapter):
 
     def set_subnet_mask(self, interface_name: str, ip: str, mask: str, gateway: Optional[str] = None) -> None:
         alias = self._resolve_alias(interface_name)
-        prefix = self.mask_to_cidr(mask)
         cmd = ["networksetup", "-setmanual", alias, ip, mask]
         if gateway:
             cmd.append(gateway)

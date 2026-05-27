@@ -4,7 +4,7 @@ import argparse
 import sys
 
 from . import __version__
-from .core import get_adapter, list_interfaces, set_static, set_dhcp
+from .core import list_interfaces, set_static, set_dhcp
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -17,7 +17,7 @@ def create_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # list
-    list_parser = subparsers.add_parser("list", help="List network interfaces")
+    subparsers.add_parser("list", help="List network interfaces")
 
     # set
     set_parser = subparsers.add_parser("set", help="Set static IP and subnet mask")

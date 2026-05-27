@@ -1,7 +1,6 @@
 """Core logic for detecting platform and executing network operations."""
 
 import platform
-import sys
 from typing import Optional
 
 from .platforms.base import NetworkInterface, PlatformAdapter
