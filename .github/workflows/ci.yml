@@ -32,11 +32,24 @@ jobs:
         run: ruff check src/
 
       - name: Syntax check
-        run: python -m py_compile src/network_switcher/*.py src/network_switcher/platforms/*.py
+        run: |
+          python -c "
+          import py_compile, pathlib, sys
+          files = list(pathlib.Path('src/network_switcher').rglob('*.py'))
+          for f in files:
+              print(f'Checking {f}...')
+              py_compile.compile(f, doraise=True)
+          print('All files OK')
+          "
 
       - name: Test import
         run: |
-          PYTHONPATH=src python -c "from network_switcher.core import list_interfaces; print('Import OK')"
+          python -c "
+          import sys
+          sys.path.insert(0, 'src')
+          from network_switcher.core import list_interfaces
+          print('Import OK')
+          "
 
   build:
     runs-on: ubuntu-latest
@@ -62,7 +75,7 @@ jobs:
 
   build-windows:
     runs-on: windows-latest
-    needs: lint-and-test
+    needs: []
     steps:
       - uses: actions/checkout@v4
 
