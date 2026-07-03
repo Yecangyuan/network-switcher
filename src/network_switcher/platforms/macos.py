@@ -45,6 +45,8 @@ class MacOSAdapter(PlatformAdapter):
 
     def set_subnet_mask(self, interface_name: str, ip: str, mask: str, gateway: Optional[str] = None) -> None:
         alias = self._resolve_alias(interface_name)
+        if gateway is None:
+            gateway = self._get_current_gateway(alias)
         cmd = ["networksetup", "-setmanual", alias, ip, mask]
         if gateway:
             cmd.append(gateway)
@@ -59,3 +61,14 @@ class MacOSAdapter(PlatformAdapter):
             if iface.name == name or iface.alias == name:
                 return iface.alias
         return name
+
+    def _get_current_gateway(self, alias: str) -> Optional[str]:
+        info = self._run(["networksetup", "-getinfo", alias], check=False)
+        match = re.search(r"^Router:\s*(.+)$", info, re.MULTILINE)
+        if not match:
+            return None
+
+        gateway = match.group(1).strip()
+        if not gateway or gateway.lower() in {"none", "not set", "(null)", "-"}:
+            return None
+        return gateway

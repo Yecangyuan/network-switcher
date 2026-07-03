@@ -24,7 +24,7 @@ def create_parser() -> argparse.ArgumentParser:
     set_parser.add_argument("interface", help="Network interface name or alias")
     set_parser.add_argument("--ip", required=True, help="Static IP address")
     set_parser.add_argument("--mask", required=True, help="Subnet mask (e.g., 255.255.255.0)")
-    set_parser.add_argument("--gateway", help="Default gateway (optional)")
+    set_parser.add_argument("--gateway", help="Default gateway (optional; preserves current gateway if omitted)")
 
     # dhcp
     dhcp_parser = subparsers.add_parser("dhcp", help="Enable DHCP on interface")

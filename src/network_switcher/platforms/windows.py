@@ -71,6 +71,9 @@ class WindowsAdapter(PlatformAdapter):
         return interfaces
 
     def set_subnet_mask(self, interface_name: str, ip: str, mask: str, gateway: Optional[str] = None) -> None:
+        if gateway is None:
+            gateway = self._get_current_gateway(interface_name)
+
         cmd = [
             "netsh",
             "interface",
@@ -91,3 +94,20 @@ class WindowsAdapter(PlatformAdapter):
             ["netsh", "interface", "ip", "set", "address", f'name="{interface_name}"', "dhcp"],
             shell=True,
         )
+
+    def _get_current_gateway(self, interface_name: str) -> Optional[str]:
+        escaped_name = interface_name.replace("'", "''")
+        ps_cmd = (
+            f"$route = Get-NetRoute -DestinationPrefix '0.0.0.0/0' -InterfaceAlias '{escaped_name}' "
+            "-ErrorAction SilentlyContinue | "
+            "Where-Object { $_.NextHop -and $_.NextHop -ne '0.0.0.0' } | "
+            "Sort-Object RouteMetric, InterfaceMetric | "
+            "Select-Object -First 1; "
+            "if ($route) { $route.NextHop }"
+        )
+        output = self._run(["powershell", "-NoProfile", "-Command", ps_cmd], check=False)
+        for line in output.splitlines():
+            gateway = line.strip()
+            if gateway and gateway != "0.0.0.0":
+                return gateway
+        return None

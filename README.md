@@ -37,7 +37,7 @@ network-switcher-gui
 GUI features:
 - **Interface list**: Browse all network adapters in a sortable table
 - **One-click select**: Click any row to auto-fill the interface name
-- **Set Static IP**: Enter IP, mask, and optional gateway, then click "Set Static IP"
+- **Set Static IP**: Enter IP, mask, and optional gateway, then click "Set Static IP". If gateway is omitted, the current gateway is preserved when possible.
 - **Enable DHCP**: Click "Enable DHCP" to switch the selected interface to DHCP
 - **Refresh**: Reload the interface list after making changes
 
@@ -69,6 +69,8 @@ network-switcher set "Ethernet" --ip 192.168.1.50 --mask 255.255.255.0 --gateway
 # macOS / Linux (run with sudo)
 sudo network-switcher set en0 --ip 192.168.1.50 --mask 255.255.255.0 --gateway 192.168.1.1
 ```
+
+When `--gateway` is omitted, Network Switcher attempts to keep the interface's existing default gateway.
 
 ### Enable DHCP
 

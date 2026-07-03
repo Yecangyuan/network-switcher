@@ -67,13 +67,23 @@ class LinuxAdapter(PlatformAdapter):
 
     def set_subnet_mask(self, interface_name: str, ip: str, mask: str, gateway: Optional[str] = None) -> None:
         prefix = self.mask_to_cidr(mask)
+        if gateway is None:
+            gateway = self._get_current_gateway(interface_name)
+
         # Remove existing IPv4 addresses
         self._run(["ip", "addr", "flush", "dev", interface_name, "label", f"{interface_name}:0"], check=False)
         self._run(["ip", "addr", "add", f"{ip}/{prefix}", "dev", interface_name])
         if gateway:
-            self._run(["ip", "route", "add", "default", "via", gateway, "dev", interface_name], check=False)
+            self._run(["ip", "route", "replace", "default", "via", gateway, "dev", interface_name], check=False)
 
     def set_dhcp(self, interface_name: str) -> None:
         # Attempt dhclient; user may need to install/use their distro's network manager
         self._run(["dhclient", "-r", interface_name], check=False)
         self._run(["dhclient", interface_name], check=False)
+
+    def _get_current_gateway(self, interface_name: str) -> Optional[str]:
+        output = self._run(["ip", "route", "show", "default", "dev", interface_name], check=False)
+        match = re.search(r"\bvia\s+(\S+)", output)
+        if match:
+            return match.group(1)
+        return None
