@@ -6,7 +6,7 @@ from typing import Optional
 
 from . import __version__
 from .core import list_interfaces, set_dhcp, set_static
-from .gui_helpers import GATEWAY_HELP_TEXT, format_interface_summary
+from .gui_helpers import GATEWAY_HELP_TEXT, GUI_TEXT, format_interface_summary
 
 
 COLORS = {
@@ -29,13 +29,13 @@ class NetworkSwitcherGUI:
 
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
-        self.root.title("Network Switcher")
+        self.root.title(GUI_TEXT["window_title"])
         self.root.geometry("980x680")
         self.root.minsize(820, 560)
         self.root.configure(bg=COLORS["app_bg"])
 
-        self.status_var = tk.StringVar(value="Ready")
-        self.summary_var = tk.StringVar(value="No interface selected")
+        self.status_var = tk.StringVar(value=GUI_TEXT["ready"])
+        self.summary_var = tk.StringVar(value=GUI_TEXT["no_interface_selected"])
         self.detail_vars = {
             "name": tk.StringVar(value="-"),
             "alias": tk.StringVar(value="-"),
@@ -128,12 +128,12 @@ class NetworkSwitcherGUI:
         header.pack(fill=tk.X, pady=(0, 14))
         header.columnconfigure(0, weight=1)
 
-        title = ttk.Label(header, text="Network Switcher", style="Title.TLabel")
+        title = ttk.Label(header, text=GUI_TEXT["header_title"], style="Title.TLabel")
         title.grid(row=0, column=0, sticky=tk.W)
 
         subtitle = ttk.Label(
             header,
-            text="Quickly inspect adapters, switch subnet masks, and preserve the current gateway by default.",
+            text=GUI_TEXT["header_subtitle"],
             style="Subtitle.TLabel",
         )
         subtitle.grid(row=1, column=0, sticky=tk.W, pady=(3, 0))
@@ -142,7 +142,7 @@ class NetworkSwitcherGUI:
         version.grid(row=0, column=1, rowspan=2, sticky=tk.E)
 
     def _build_interface_table(self, parent: ttk.Frame) -> None:
-        list_frame = ttk.LabelFrame(parent, text="Network Interfaces", style="Card.TLabelframe", padding=12)
+        list_frame = ttk.LabelFrame(parent, text=GUI_TEXT["interfaces_title"], style="Card.TLabelframe", padding=12)
         list_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 12))
         list_frame.grid_rowconfigure(0, weight=1)
         list_frame.grid_columnconfigure(0, weight=1)
@@ -150,12 +150,12 @@ class NetworkSwitcherGUI:
         columns = ("name", "alias", "ip", "mask", "mac", "status")
         self.tree = ttk.Treeview(list_frame, columns=columns, show="headings", selectmode="browse")
         headings = {
-            "name": "Device",
-            "alias": "Service",
-            "ip": "IP Address",
-            "mask": "Subnet Mask",
-            "mac": "MAC Address",
-            "status": "Status",
+            "name": GUI_TEXT["device_column"],
+            "alias": GUI_TEXT["service_column"],
+            "ip": GUI_TEXT["ip_column"],
+            "mask": GUI_TEXT["mask_column"],
+            "mac": GUI_TEXT["mac_column"],
+            "status": GUI_TEXT["status_column"],
         }
         widths = {
             "name": 120,
@@ -192,7 +192,7 @@ class NetworkSwitcherGUI:
         self._build_config_panel(lower)
 
     def _build_details_panel(self, parent: ttk.Frame) -> None:
-        details = ttk.LabelFrame(parent, text="Selected Interface", style="Card.TLabelframe", padding=12)
+        details = ttk.LabelFrame(parent, text=GUI_TEXT["selected_title"], style="Card.TLabelframe", padding=12)
         details.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
         details.columnconfigure(1, weight=1)
 
@@ -200,12 +200,12 @@ class NetworkSwitcherGUI:
         summary.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
 
         rows = [
-            ("Device", "name"),
-            ("Service", "alias"),
-            ("IP Address", "ip"),
-            ("Subnet Mask", "mask"),
-            ("MAC Address", "mac"),
-            ("Status", "status"),
+            (GUI_TEXT["device_label"], "name"),
+            (GUI_TEXT["service_label"], "alias"),
+            (GUI_TEXT["ip_label"], "ip"),
+            (GUI_TEXT["mask_label"], "mask"),
+            (GUI_TEXT["mac_label"], "mac"),
+            (GUI_TEXT["status_label"], "status"),
         ]
         for index, (label, key) in enumerate(rows, start=1):
             ttk.Label(details, text=f"{label}:", style="Label.TLabel").grid(row=index, column=0, sticky=tk.W, pady=2)
@@ -218,21 +218,21 @@ class NetworkSwitcherGUI:
             )
 
     def _build_config_panel(self, parent: ttk.Frame) -> None:
-        config = ttk.LabelFrame(parent, text="Configuration", style="Card.TLabelframe", padding=12)
+        config = ttk.LabelFrame(parent, text=GUI_TEXT["configuration_title"], style="Card.TLabelframe", padding=12)
         config.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
         config.columnconfigure(1, weight=1)
         config.columnconfigure(3, weight=1)
 
-        ttk.Label(config, text="IP Address (required)", style="Label.TLabel").grid(row=0, column=0, sticky=tk.W, padx=(0, 8), pady=5)
+        ttk.Label(config, text=GUI_TEXT["ip_required_label"], style="Label.TLabel").grid(row=0, column=0, sticky=tk.W, padx=(0, 8), pady=5)
         self.entry_ip = ttk.Entry(config, width=22)
         self.entry_ip.grid(row=0, column=1, sticky="ew", padx=(0, 14), pady=5)
 
-        ttk.Label(config, text="Subnet Mask (required)", style="Label.TLabel").grid(row=0, column=2, sticky=tk.W, padx=(0, 8), pady=5)
+        ttk.Label(config, text=GUI_TEXT["mask_required_label"], style="Label.TLabel").grid(row=0, column=2, sticky=tk.W, padx=(0, 8), pady=5)
         self.entry_mask = ttk.Entry(config, width=22)
         self.entry_mask.insert(0, "255.255.255.0")
         self.entry_mask.grid(row=0, column=3, sticky="ew", pady=5)
 
-        ttk.Label(config, text="Gateway", style="Label.TLabel").grid(row=1, column=0, sticky=tk.W, padx=(0, 8), pady=5)
+        ttk.Label(config, text=GUI_TEXT["gateway_label"], style="Label.TLabel").grid(row=1, column=0, sticky=tk.W, padx=(0, 8), pady=5)
         self.entry_gateway = ttk.Entry(config, width=22)
         self.entry_gateway.grid(row=1, column=1, sticky="ew", padx=(0, 14), pady=5)
 
@@ -244,11 +244,11 @@ class NetworkSwitcherGUI:
         for column in range(5):
             actions.columnconfigure(column, weight=1)
 
-        ttk.Button(actions, text="Refresh", command=self.refresh_interfaces, style="Secondary.TButton").grid(row=0, column=0, sticky="ew", padx=(0, 6))
-        ttk.Button(actions, text="Set Static IP", command=self._set_static, style="Primary.TButton").grid(row=0, column=1, sticky="ew", padx=6)
-        ttk.Button(actions, text="Switch to /16", command=lambda: self._apply_mask("255.255.0.0"), style="Accent.TButton").grid(row=0, column=2, sticky="ew", padx=6)
-        ttk.Button(actions, text="Switch to /24", command=lambda: self._apply_mask("255.255.255.0"), style="Accent.TButton").grid(row=0, column=3, sticky="ew", padx=6)
-        ttk.Button(actions, text="Enable DHCP", command=self._enable_dhcp, style="Secondary.TButton").grid(row=0, column=4, sticky="ew", padx=(6, 0))
+        ttk.Button(actions, text=GUI_TEXT["refresh_button"], command=self.refresh_interfaces, style="Secondary.TButton").grid(row=0, column=0, sticky="ew", padx=(0, 6))
+        ttk.Button(actions, text=GUI_TEXT["set_static_button"], command=self._set_static, style="Primary.TButton").grid(row=0, column=1, sticky="ew", padx=6)
+        ttk.Button(actions, text=GUI_TEXT["switch_16_button"], command=lambda: self._apply_mask("255.255.0.0"), style="Accent.TButton").grid(row=0, column=2, sticky="ew", padx=6)
+        ttk.Button(actions, text=GUI_TEXT["switch_24_button"], command=lambda: self._apply_mask("255.255.255.0"), style="Accent.TButton").grid(row=0, column=3, sticky="ew", padx=6)
+        ttk.Button(actions, text=GUI_TEXT["enable_dhcp_button"], command=self._enable_dhcp, style="Secondary.TButton").grid(row=0, column=4, sticky="ew", padx=(6, 0))
 
     def _on_select(self, _event: Optional[tk.Event] = None) -> None:
         selection = self.tree.selection()
@@ -268,7 +268,7 @@ class NetworkSwitcherGUI:
 
     def refresh_interfaces(self) -> None:
         self.tree.delete(*self.tree.get_children())
-        self.status_var.set("Loading interfaces...")
+        self.status_var.set(GUI_TEXT["loading_interfaces"])
         self.root.update_idletasks()
 
         try:
@@ -281,15 +281,15 @@ class NetworkSwitcherGUI:
                     values=(iface.name, iface.alias, iface.ip or "-", iface.mask or "-", iface.mac or "-", iface.status or "-"),
                     tags=(tag,),
                 )
-            self.status_var.set(f"Loaded {len(interfaces)} interface(s)")
+            self.status_var.set(GUI_TEXT["loaded_interfaces"].format(count=len(interfaces)))
             if not interfaces:
                 self._reset_selection_details()
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to list interfaces:\n{e}")
-            self.status_var.set("Error loading interfaces")
+            messagebox.showerror(GUI_TEXT["error_title"], GUI_TEXT["list_failed"].format(error=e))
+            self.status_var.set(GUI_TEXT["list_failed_status"])
 
     def _reset_selection_details(self) -> None:
-        self.summary_var.set("No interface selected")
+        self.summary_var.set(GUI_TEXT["no_interface_selected"])
         for value in self.detail_vars.values():
             value.set("-")
 
@@ -300,7 +300,7 @@ class NetworkSwitcherGUI:
     def _get_selected_name(self) -> str:
         selection = self.tree.selection()
         if not selection:
-            raise ValueError("No interface selected.")
+            raise ValueError(GUI_TEXT["select_required"])
         item = self.tree.item(selection[0])
         return str(item["values"][0])
 
@@ -315,7 +315,7 @@ class NetworkSwitcherGUI:
         try:
             name = self._get_selected_name()
         except ValueError as e:
-            messagebox.showwarning("Warning", str(e))
+            messagebox.showwarning(GUI_TEXT["warning_title"], str(e))
             return
 
         ip = self.entry_ip.get().strip()
@@ -323,71 +323,71 @@ class NetworkSwitcherGUI:
         gateway = self.entry_gateway.get().strip() or None
 
         if not ip or not mask:
-            messagebox.showwarning("Warning", "IP Address and Subnet Mask are required.")
+            messagebox.showwarning(GUI_TEXT["warning_title"], GUI_TEXT["ip_mask_required"])
             return
 
-        self.status_var.set(f"Setting static IP for {name}...")
+        self.status_var.set(GUI_TEXT["setting_static"].format(name=name))
         self.root.update_idletasks()
 
         try:
             set_static(name, ip, mask, gateway)
-            messagebox.showinfo("Success", f"Static IP set for {name}:\n{ip} / {mask}")
+            messagebox.showinfo(GUI_TEXT["success_title"], GUI_TEXT["static_success"].format(name=name, ip=ip, mask=mask))
             self.refresh_interfaces()
         except PermissionError:
-            messagebox.showerror("Permission Denied", "Administrator/root privileges are required to modify network settings.")
-            self.status_var.set("Permission denied")
+            messagebox.showerror(GUI_TEXT["permission_title"], GUI_TEXT["permission_required"])
+            self.status_var.set(GUI_TEXT["permission_status"])
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to set static IP:\n{e}")
-            self.status_var.set("Error")
+            messagebox.showerror(GUI_TEXT["error_title"], GUI_TEXT["set_static_failed"].format(error=e))
+            self.status_var.set(GUI_TEXT["operation_failed_status"])
 
     def _apply_mask(self, mask: str) -> None:
         try:
             name = self._get_selected_name()
         except ValueError as e:
-            messagebox.showwarning("Warning", str(e))
+            messagebox.showwarning(GUI_TEXT["warning_title"], str(e))
             return
 
         ip = self.entry_ip.get().strip() or self._current_selected_ip()
         if not ip:
-            messagebox.showwarning("Warning", "IP Address is required. Enter an IP or select an interface that already has one.")
+            messagebox.showwarning(GUI_TEXT["warning_title"], GUI_TEXT["ip_required"])
             return
 
         gateway = self.entry_gateway.get().strip() or None
 
-        self.status_var.set(f"Switching {name} to {mask}...")
+        self.status_var.set(GUI_TEXT["switching_mask"].format(name=name, mask=mask))
         self.root.update_idletasks()
 
         try:
             set_static(name, ip, mask, gateway)
-            messagebox.showinfo("Success", f"Subnet mask changed for {name}:\n{ip} / {mask}")
+            messagebox.showinfo(GUI_TEXT["success_title"], GUI_TEXT["mask_success"].format(name=name, ip=ip, mask=mask))
             self.refresh_interfaces()
         except PermissionError:
-            messagebox.showerror("Permission Denied", "Administrator/root privileges are required to modify network settings.")
-            self.status_var.set("Permission denied")
+            messagebox.showerror(GUI_TEXT["permission_title"], GUI_TEXT["permission_required"])
+            self.status_var.set(GUI_TEXT["permission_status"])
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to change subnet mask:\n{e}")
-            self.status_var.set("Error")
+            messagebox.showerror(GUI_TEXT["error_title"], GUI_TEXT["mask_failed"].format(error=e))
+            self.status_var.set(GUI_TEXT["operation_failed_status"])
 
     def _enable_dhcp(self) -> None:
         try:
             name = self._get_selected_name()
         except ValueError as e:
-            messagebox.showwarning("Warning", str(e))
+            messagebox.showwarning(GUI_TEXT["warning_title"], str(e))
             return
 
-        self.status_var.set(f"Enabling DHCP for {name}...")
+        self.status_var.set(GUI_TEXT["enabling_dhcp"].format(name=name))
         self.root.update_idletasks()
 
         try:
             set_dhcp(name)
-            messagebox.showinfo("Success", f"DHCP enabled for {name}.")
+            messagebox.showinfo(GUI_TEXT["success_title"], GUI_TEXT["dhcp_success"].format(name=name))
             self.refresh_interfaces()
         except PermissionError:
-            messagebox.showerror("Permission Denied", "Administrator/root privileges are required to modify network settings.")
-            self.status_var.set("Permission denied")
+            messagebox.showerror(GUI_TEXT["permission_title"], GUI_TEXT["permission_required"])
+            self.status_var.set(GUI_TEXT["permission_status"])
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to enable DHCP:\n{e}")
-            self.status_var.set("Error")
+            messagebox.showerror(GUI_TEXT["error_title"], GUI_TEXT["dhcp_failed"].format(error=e))
+            self.status_var.set(GUI_TEXT["operation_failed_status"])
 
 
 def main() -> int:
